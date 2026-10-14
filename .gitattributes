@@ -1,0 +1,6 @@
+# Deno Deploy builds on Linux. Pin line endings so a Windows checkout does not
+# commit CRLF into src/worker.js and inflate every future diff.
+* text=auto eol=lf
+
+# The bundle is generated; keep it out of language stats and diff noise.
+src/worker.js linguist-generated=true -diff

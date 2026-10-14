@@ -1,0 +1,22 @@
+{
+  "name": "blueknight-panel-deno",
+  "version": "5.2.7",
+  "exports": "./src/index.js",
+  "imports": {
+    "cloudflare:sockets": "./src/shims/sockets.js"
+  },
+  "lock": false,
+  "nodeModulesDir": "none",
+  "compilerOptions": {
+    "checkJs": false,
+    "lib": ["deno.window", "deno.ns", "dom", "dom.iterable"]
+  },
+  "tasks": {
+    "start": "DENO_KV_PATH=data/blueknight_kv.sqlite3 deno run --allow-all --unstable-kv src/index.js",
+    "dev": "DENO_KV_PATH=data/blueknight_kv.sqlite3 deno run --allow-all --unstable-kv --watch src/index.js",
+    "smoke": "deno run --allow-all --unstable-kv tools/smoke.js",
+    "dns": "deno run --allow-all --unstable-kv tools/dns-local.js",
+    "probe": "deno run --allow-all --unstable-kv tools/probe.js",
+    "reset": "deno run --allow-all tools/reset.js"
+  }
+}
