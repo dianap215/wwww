@@ -1,12 +1,15 @@
 {
-  "name": "blueknight-panel-deno",
-  "version": "5.2.7",
-  "exports": "./src/index.js",
+  "lock": false,
+  "nodeModulesDir": "none",
+  "deploy": {
+    "runtime": {
+      "type": "dynamic",
+      "entrypoint": "./src/index.js"
+    }
+  },
   "imports": {
     "cloudflare:sockets": "./src/shims/sockets.js"
   },
-  "lock": false,
-  "nodeModulesDir": "none",
   "compilerOptions": {
     "checkJs": false,
     "lib": ["deno.window", "deno.ns", "dom", "dom.iterable"]

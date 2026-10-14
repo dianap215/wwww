@@ -99,21 +99,36 @@ supported** — the repository root must be this folder. Push it as its own repo
 1. **Create the app** — [console.deno.com](https://console.deno.com) → `+ New App`
    → pick the repository.
 
-2. **Build config** (`Edit build config`):
+2. **Build config** — `deno.json` already declares this in source, which takes
+   precedence over the dashboard, so the fields below should be greyed out:
+
+   ```json
+   "deploy": {
+     "runtime": { "type": "dynamic", "entrypoint": "./src/index.js" }
+   }
+   ```
+
+   If the dashboard is editable (i.e. the source config was not picked up), set
+   it by hand:
 
    | Field | Value |
    | --- | --- |
+   | **App directory** | *(empty — the repository root)* |
    | Framework preset | `No Preset` |
-   | Install command | *(leave empty — there is no `package.json`)* |
-   | Build command | *(leave empty)* |
+   | Install command | *(empty)* |
+   | Build command | *(empty)* |
    | Runtime configuration | `Dynamic` |
-   | **Dynamic Entrypoint** | **`src/index.js`** |
-   | Dynamic arguments | *(empty)* |
-   | Static Directory | *(empty)* |
-   | Single Page App mode | off |
+   | **Entrypoint** | **`src/index.js`** |
+   | Arguments / Runtime working directory | *(empty)* |
 
-   `src/index.js` is deliberate: it is the path the failed build was already
-   pointing at, so no change is needed if you are updating an existing app.
+   `src/index.js` is deliberate: it is the path the original failed build was
+   already pointing at, so nothing changes if you are updating an existing app.
+
+   **App directory is the one setting `deno.json` cannot control** — it decides
+   where `deno.json` itself is read from. If it is not empty, the entrypoint is
+   resolved from inside that subdirectory and the build fails with
+   `Entrypoint at '/tmp/build/src/index.js' not found` even though the file is
+   plainly in the repository.
 
 3. **Provision KV** — the panel needs somewhere to keep the admin password, the
    VLESS UUID and the subscription token. Without it the panel still boots, but
@@ -177,3 +192,34 @@ DoH check needs that app to reach the internet, which it can.
   the Cloudflare API to replace the running script. There is no equivalent here
   — to update, replace `src/worker.js` from a newer `dist/worker-standalone.js`
   and push.
+
+---
+
+## Troubleshooting
+
+### `Entrypoint at '/tmp/build/src/index.js' not found`
+
+The file is in the repository — verified with
+`raw.githubusercontent.com/<owner>/<repo>/main/src/index.js`. The build is
+looking somewhere else. In order of likelihood:
+
+1. **App directory is not empty.** It defaults to the repository root; anything
+   else shifts where the entrypoint is resolved from. This is the one field
+   `deno.json` cannot override. Clear it.
+2. **The build is stale.** A build that ran before the first push only ever saw
+   the repository's auto-generated `README.md` commit, and its failure message
+   stays on the page. Press **Deploy Default Branch** on the builds page to
+   build the current `main` rather than reading the old log.
+3. **The app is linked to a different repository.** Check the app settings page;
+   you can unlink and relink without recreating the app.
+
+### Deploying without GitHub
+
+`deno deploy` can push a local directory, bypassing the GitHub integration
+entirely — useful for isolating whether a failure is in the repo or the build
+config:
+
+```sh
+deno deploy create --org <org> --app <app> --source local
+```
+
