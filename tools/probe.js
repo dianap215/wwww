@@ -10,10 +10,10 @@ try {
 }
 
 try {
-  await import('cloudflare:sockets');
-  line('import("cloudflare:sockets")', 'RESOLVED (unexpected)');
+  const mod = await import('cloudflare:sockets');
+  line('import "cloudflare:sockets"', `resolved via the deno.json import map -> ./src/shims/sockets.js (connect=${typeof mod.connect})`);
 } catch (err) {
-  line('import("cloudflare:sockets")', `rejects catchably -> ${err.constructor.name}: ${err.message}`);
+  line('import "cloudflare:sockets"', `NOT resolved — the proxy relay would have no dial path: ${err.message}`);
 }
 
 try {
